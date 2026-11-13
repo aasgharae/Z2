@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#120b26"/>
+<title>نگهبان قلعه — دوشیزگان نور</title>
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div id="wrap">
+  <div id="hud">
+    <div class="pill">💡 <span id="light">۰</span></div>
+    <div class="pill">🌊 موج <span id="wave">۰</span></div>
+    <div class="pill" id="hearts">❤️❤️❤️</div>
+    <div class="spacer"></div>
+    <button class="iconbtn" id="sndBtn">🔊</button>
+    <button class="iconbtn" id="pauseBtn">⏸️</button>
+  </div>
+  <div id="stage">
+    <canvas id="cv"></canvas>
+    <div class="overlay" id="intro">
+      <h1>🏰 نگهبان قلعه</h1>
+      <h2>دوشیزگان نور — نبرد با دیوها</h2>
+      <div class="howto">
+        <div>💡 روی گوی‌های نور بزنید تا جمعشان کنید</div>
+        <div>🌼 دوشیزه‌ی نور بکارید تا نور بسازد</div>
+        <div>🏹 کماندار و 🔥 جادوگر در همان ردیف دفاع می‌کنند</div>
+        <div>🛡 سنگ‌سپر جلوی دیوها را می‌گیرد</div>
+        <div>👹 نگذارید دیوها به دیوار قلعه برسند!</div>
+      </div>
+      <button class="bigbtn" id="startBtn">⚔️ شروع نبرد</button>
+      <div id="bestIntro" class="bestline"></div>
+    </div>
+    <div class="overlay hidden" id="over">
+      <h1>💀 قلعه سقوط کرد!</h1>
+      <div class="stats">
+        <div class="stat">موج<b id="ovWave">۰</b></div>
+        <div class="stat">دیوهای شکست‌داده<b id="ovKill">۰</b></div>
+        <div class="stat">رکورد<b id="ovBest">۰</b></div>
+      </div>
+      <button class="bigbtn" id="againBtn">🔄 دوباره بازی</button>
+    </div>
+  </div>
+  <div id="cards"></div>
+</div>
+<script src="js/config.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/art.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
