@@ -30,6 +30,7 @@ const EDEF={
   div:   {hp:120, spd:13, dmg:14, rate:1.0, r:0.30, color:'#e05252', c2:'#8f2b3f', score:1},
   runner:{hp:70,  spd:27, dmg:10, rate:0.8, r:0.26, color:'#f0923e', c2:'#a04a12', score:1},
   brute: {hp:430, spd:9,  dmg:26, rate:1.3, r:0.42, color:'#a14be0', c2:'#5d2b8f', score:3},
+  ghoul: {hp:620, spd:8,  dmg:0,  rate:1,   r:0.52, color:'#8aa84f', c2:'#4c6b25', score:6, fuck:true, fuckTime:3.0},
 };
 
 // ==================== ابزارهای رسم ====================
