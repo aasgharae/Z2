@@ -102,3 +102,6 @@ function limb(x1,y1,x2,y2,w,c){
   ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
 }
 const STARS=Array.from({length:80},()=>({x:Math.random(),y:Math.random()*0.5,r:0.5+Math.random()*1.4,p:Math.random()*7}));
+
+orient();
+setTimeout(orient,50);
