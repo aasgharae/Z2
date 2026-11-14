@@ -9,10 +9,29 @@ const G={
 for(const k in UNITS) G.cds[k]=0;
 let best=0; try{ best=parseInt(localStorage.getItem('negahban_best')||'0')||0; }catch(e){}
 
+// ==================== دکمه‌ها (قبل از هر چیز سنگین) ====================
+document.getElementById('startBtn').addEventListener('pointerdown',function(){
+  document.getElementById('intro').classList.add('hidden');
+  G.started=true;
+  beep(523,0.15,'triangle',0.1);
+  announce('🛡 از قلعه دفاع کنید!');
+  setTimeout(function(){ resize(); },60);
+});
+document.getElementById('pauseBtn').addEventListener('click',function(){
+  if(!G.started||G.over) return;
+  G.paused=!G.paused; this.textContent=G.paused?'▶️':'⏸️';
+});
+document.getElementById('sndBtn').addEventListener('click',function(){
+  muted=!muted; this.textContent=muted?'🔇':'🔊';
+});
+document.getElementById('againBtn').addEventListener('click',function(){ location.reload(); });
+
+// ==================== مختصات ====================
 function rowY(r){ return oy+r*cell+cell/2; }
 function colX(c){ return ox+c*cell+cell/2; }
 function laneY(r){ return oy+r*cell+cell*0.80; }
 
+// ==================== موج‌ها ====================
 function buildQueue(n){
   const q=[]; const count=3+Math.floor(n*1.7);
   for(let i=0;i<count;i++){
@@ -40,9 +59,10 @@ function spawnEnemy(type){
   G.enemies.push({type,row,x:ox+cell*COLS+cell*0.6,y:laneY(row),
     hp:Math.round(d.hp*hpMul),maxHp:Math.round(d.hp*hpMul),
     atk:0,anim:Math.random()*6,flash:0,dead:false,seed:Math.random()*10,
-    jig:0,jigV:0,mating:false,target:null,mateT:0,cool:0,pose:'anal'});
+    jig:0,jigV:0,mating:false,target:null,mateT:0,cool:0,pose:'anal',slowed:0});
 }
 
+// ==================== موجودیت‌ها ====================
 function placeUnit(type,row,col){
   const u={type,row,col,x:colX(col),y:rowY(row),hp:UNITS[type].hp,maxHp:UNITS[type].hp,
     fire:0.4,prod:3.5,healT:0,anim:Math.random()*6,flash:0,recoil:0,target:null,jig:0,jigV:0,
@@ -98,6 +118,7 @@ function gameOver(){
   chord([330,262,196,131],0.3,'sawtooth',0.09);
 }
 
+// ==================== افکت‌ها ====================
 function puff(x,y,color,n){
   for(let i=0;i<n;i++){
     const a=Math.random()*Math.PI*2, s=cell*(0.5+Math.random()*1.2);
@@ -136,6 +157,7 @@ function finishMate(e,u){
   beep(300,0.18,'sine',0.09); beep(180,0.3,'sawtooth',0.06);
 }
 
+// ==================== به‌روزرسانی ====================
 function update(dt){
   for(const k in G.cds) G.cds[k]=Math.max(0,G.cds[k]-dt);
   if(G.phase==='prep'){
@@ -303,37 +325,7 @@ function update(dt){
   G.ann=G.ann.filter(a=>a.t>0);
 }
 
-function render(now){
-  const t=now/1000;
-  ctx.clearRect(0,0,W,H);
-  ctx.save();
-  if(G.shake>0){
-    G.shake=Math.max(0,G.shake-0.03);
-    ctx.translate((Math.random()-0.5)*G.shake*14,(Math.random()-0.5)*G.shake*14);
-  }
-  drawSky(t); drawCastle(t);
-  for(const o of G.orbs) drawOrb(o,t);
-  const us=G.units.slice().sort((a,b)=>a.row-b.row||a.x-b.x);
-  for(const u of us) drawUnit(u,t);
-  for(const e of G.enemies) drawEnemy(e,t);
-  for(const p of G.projs) drawProj(p);
-  drawParts(); drawFloats(); drawGhost(t);
-  ctx.restore();
-  drawVignette(); drawAnn(); drawPrep();
-  if(G.paused&&G.started&&!G.over){
-    ctx.fillStyle='rgba(10,6,24,0.55)'; ctx.fillRect(0,0,W,H);
-    ctx.textAlign='center'; ctx.fillStyle='#fff'; ctx.font='900 40px Tahoma';
-    ctx.fillText('⏸ مکث',W/2,H/2);
-  }
-  document.getElementById('light').textContent=G.light.toLocaleString('fa-IR');
-  document.getElementById('wave').textContent=G.wave.toLocaleString('fa-IR');
-  document.getElementById('fucked').textContent=G.fucked.toLocaleString('fa-IR');
-  document.getElementById('hearts').textContent='❤️'.repeat(Math.max(0,G.hearts))+'🖤'.repeat(Math.max(0,3-G.hearts));
-  for(const k in UNITS){
-    const el=document.querySelector('.card[data-type="'+k+'"]');
-    if(el) el.classList.toggle('off',G.cds[k]>0||G.light<UNITS[k].cost);
-  }
-}
+// ==================== رندر ====================
 function drawOrb(o,t){
   const pul=1+0.12*Math.sin(t*4+o.seed);
   glow(o.x,o.y,cell*0.42*pul,'255,220,120',0.7);
@@ -369,6 +361,39 @@ function drawProj(p){
   }
 }
 
+function render(now){
+  const t=now/1000;
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  if(G.shake>0){
+    G.shake=Math.max(0,G.shake-0.03);
+    ctx.translate((Math.random()-0.5)*G.shake*14,(Math.random()-0.5)*G.shake*14);
+  }
+  drawSky(t); drawCastle(t);
+  for(const o of G.orbs) drawOrb(o,t);
+  const us=G.units.slice().sort((a,b)=>a.row-b.row||a.x-b.x);
+  for(const u of us) drawUnit(u,t);
+  for(const e of G.enemies) drawEnemy(e,t);
+  for(const p of G.projs) drawProj(p);
+  drawParts(); drawFloats(); drawGhost(t);
+  ctx.restore();
+  drawVignette(); drawAnn(); drawPrep();
+  if(G.paused&&G.started&&!G.over){
+    ctx.fillStyle='rgba(10,6,24,0.55)'; ctx.fillRect(0,0,W,H);
+    ctx.textAlign='center'; ctx.fillStyle='#fff'; ctx.font='900 40px Tahoma';
+    ctx.fillText('⏸ مکث',W/2,H/2);
+  }
+  document.getElementById('light').textContent=G.light.toLocaleString('fa-IR');
+  document.getElementById('wave').textContent=G.wave.toLocaleString('fa-IR');
+  document.getElementById('fucked').textContent=G.fucked.toLocaleString('fa-IR');
+  document.getElementById('hearts').textContent='❤️'.repeat(Math.max(0,G.hearts))+'🖤'.repeat(Math.max(0,3-G.hearts));
+  for(const k in UNITS){
+    const el=document.querySelector('.card[data-type="'+k+'"]');
+    if(el) el.classList.toggle('off',G.cds[k]>0||G.light<UNITS[k].cost);
+  }
+}
+
+// ==================== حلقه ====================
 let last=performance.now();
 function loop(now){
   let dt=(now-last)/1000; last=now;
@@ -379,6 +404,7 @@ function loop(now){
 }
 requestAnimationFrame(loop);
 
+// ==================== ورودی ====================
 function toGame(e){
   const r=canvas.getBoundingClientRect();
   if(isRot()) return {x:e.clientY-r.top,y:r.right-e.clientX};
@@ -413,6 +439,7 @@ canvas.addEventListener('pointerdown',function(e){
 canvas.addEventListener('pointermove',function(e){ G.hover=cellAt(toGame(e)); });
 canvas.addEventListener('contextmenu',function(e){ e.preventDefault(); });
 
+// ==================== کارت‌ها ====================
 const cardsEl=document.getElementById('cards');
 function paintPortrait(cv,type){
   const old=ctx;
@@ -442,18 +469,5 @@ for(const k in UNITS){
   });
   cardsEl.appendChild(b);
 }
-document.getElementById('pauseBtn').addEventListener('click',function(){
-  if(!G.started||G.over) return;
-  G.paused=!G.paused; this.textContent=G.paused?'▶️':'⏸️';
-});
-document.getElementById('sndBtn').addEventListener('click',function(){
-  muted=!muted; this.textContent=muted?'🔇':'🔊';
-});
-document.getElementById('startBtn').addEventListener('click',function(){
-  document.getElementById('intro').classList.add('hidden');
-  G.started=true;
-  beep(523,0.15,'triangle',0.1);
-  announce('🛡 از قلعه دفاع کنید!');
-});
-document.getElementById('againBtn').addEventListener('click',function(){ location.reload(); });
+
 if(best>0) document.getElementById('bestIntro').textContent='🏆 رکورد شما: موج '+best.toLocaleString('fa-IR');
