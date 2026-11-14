@@ -2,43 +2,76 @@
 const COLS=9, ROWS=5;
 const POSES=['anal','vag','oral'];
 const canvas=document.getElementById('cv');
+const wrapEl=document.getElementById('wrap');
+const stageEl=document.getElementById('stage');
 let ctx=canvas.getContext('2d');
 let W=0,H=0,DPR=1,cell=0,ox=0,oy=0;
 
 function isRot(){ return document.documentElement.classList.contains('rot'); }
 
-function orient(){
-  const portrait=window.innerHeight>window.innerWidth;
-  document.documentElement.classList.toggle('rot',portrait);
-  setTimeout(resize,30);
+function viewSize(){
+  const vp=window.visualViewport;
+  return {
+    w:Math.round(vp?vp.width:(window.innerWidth||document.documentElement.clientWidth)),
+    h:Math.round(vp?vp.height:(window.innerHeight||document.documentElement.clientHeight))
+  };
 }
+
+function orient(){
+  const v=viewSize();
+  const portrait=v.h>v.w;
+  document.documentElement.classList.toggle('rot',portrait);
+  if(portrait){
+    wrapEl.style.width=v.h+'px';
+    wrapEl.style.height=v.w+'px';
+    wrapEl.style.transform='translateX('+v.w+'px) rotate(90deg)';
+  }else{
+    wrapEl.style.width=v.w+'px';
+    wrapEl.style.height=v.h+'px';
+    wrapEl.style.transform='';
+  }
+  resize();
+}
+
 function resize(){
-  const st=document.getElementById('stage');
-  const w=st.offsetWidth||window.innerWidth;
-  const h=st.offsetHeight||window.innerHeight;
+  const w=stageEl.offsetWidth||viewSize().h;
+  const h=stageEl.offsetHeight||viewSize().w;
+  if(w<10||h<10) return;
   DPR=Math.min(window.devicePixelRatio||1,2);
   W=w; H=h;
   canvas.width=Math.round(W*DPR); canvas.height=Math.round(H*DPR);
   canvas.style.width=W+'px'; canvas.style.height=H+'px';
   ctx.setTransform(DPR,0,0,DPR,0,0);
-  cell=Math.min(W*0.97/(COLS+0.9), H*0.96/ROWS);
+  cell=Math.min(W*0.96/(COLS+0.8), H*0.96/ROWS);
   ox=(W-cell*COLS)/2;
   oy=(H-cell*ROWS)/2;
 }
-window.addEventListener('resize',function(){ orient(); });
-window.addEventListener('orientationchange',function(){ setTimeout(function(){ orient(); resize(); },250); });
-orient();
-resize();
+
+let rzT=0;
+function reflow(){
+  clearTimeout(rzT);
+  rzT=setTimeout(function(){ orient(); },120);
+}
+window.addEventListener('resize',reflow);
+window.addEventListener('orientationchange',function(){ setTimeout(orient,250); });
+if(window.visualViewport) window.visualViewport.addEventListener('resize',reflow);
+
+window.addEventListener('error',function(ev){
+  const d=document.getElementById('errbox');
+  if(!d) return;
+  d.style.display='block';
+  d.textContent+=(ev.message||'error')+' @ '+(ev.filename||'?').split('/').pop()+':'+(ev.lineno||'?')+'\n';
+});
 
 // ==================== واحدهای بازیکن ====================
 const UNITS={
-  flower:  {name:'دوشیزه نور',  cost:50,  hp:90,  color:'#7ee081', cd:3},
-  archer:  {name:'کماندار',     cost:100, hp:110, dmg:22, rate:1.25, color:'#5ec8d8', cd:4},
-  wall:    {name:'سنگ‌سپر',     cost:50,  hp:460, color:'#b8b2c9', cd:5},
-  mage:    {name:'جادوگر آتش',  cost:175, hp:100, dmg:42, rate:2.1, splash:52, color:'#c58bff', cd:6},
-  succubus:{name:'ساکوبوس',     cost:150, hp:130, dmg:9,  rate:1.6, slow:0.4, color:'#e05f9e', cd:7},
-  nun:     {name:'راهبه',       cost:200, hp:150, heal:9,  color:'#ffe08a', cd:8},
-  hunter:  {name:'شکارچی',      cost:225, hp:120, dmg:58, rate:1.5, range:2.6, color:'#b8d94a', cd:9},
+  flower:  {name:'دوشیزه نور', cost:50,  hp:90,  color:'#7ee081', cd:3},
+  archer:  {name:'کماندار',    cost:100, hp:110, dmg:22, rate:1.25, color:'#5ec8d8', cd:4},
+  wall:    {name:'سنگ‌سپر',    cost:50,  hp:460, color:'#b8b2c9', cd:5},
+  mage:    {name:'جادوگر',     cost:175, hp:100, dmg:42, rate:2.1, splash:52, color:'#c58bff', cd:6},
+  succubus:{name:'ساکوبوس',    cost:150, hp:130, dmg:9,  rate:1.6, slow:0.4, color:'#e05f9e', cd:7},
+  nun:     {name:'راهبه',      cost:200, hp:150, heal:9,  color:'#ffe08a', cd:8},
+  hunter:  {name:'شکارچی',     cost:225, hp:120, dmg:58, rate:1.5, range:2.6, color:'#b8d94a', cd:9},
 };
 
 // ==================== دشمنان ====================
@@ -50,7 +83,6 @@ const EDEF={
   boss:  {hp:2400,spd:5.5,dmg:0,  rate:1,   r:0.78, color:'#c9779f', c2:'#7a3a5c', score:25, fuck:true, fuckTime:3.8, boss:true},
 };
 
-// ==================== صراحت بر اساس موج ====================
 function heatStrip(){
   if(G.wave<=2) return 0;
   return Math.min(2.6,(G.wave-2)*0.52);
