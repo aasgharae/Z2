@@ -13,6 +13,7 @@
   <div id="hud">
     <div class="pill">💡 <span id="light">۰</span></div>
     <div class="pill">🌊 موج <span id="wave">۰</span></div>
+    <div class="pill">💦 شکار <span id="fucked">۰</span></div>
     <div class="pill" id="hearts">❤️❤️❤️</div>
     <div class="spacer"></div>
     <button class="iconbtn" id="sndBtn">🔊</button>
@@ -28,8 +29,9 @@
         <div>🌼 دوشیزه‌ی نور بکارید تا نور بسازد</div>
         <div>🏹 کماندار و 🔥 جادوگر در همان ردیف دفاع می‌کنند</div>
         <div>🛡 سنگ‌سپر جلوی دیوها را می‌گیرد</div>
-        <div>👗 با هر ضربه لباس‌ها پاره می‌شوند</div>
-        <div>😈 غول‌ها دخترها را می‌گیرند و از پشت می‌گایندشان!</div>
+        <div>💃 ساکوبوس دیوها را کند می‌کند، راهبه زخم‌ها را می‌بندد</div>
+        <div>👗 هر موج که می‌گذرد لباس‌ها کمتر می‌شوند</div>
+        <div>😈 غول‌ها دخترها را از پشت، از جلو و با دهان می‌گیرند</div>
         <div>👹 نگذارید دیوها به دیوار قلعه برسند</div>
       </div>
       <button class="bigbtn" id="startBtn">⚔️ شروع نبرد</button>
@@ -40,6 +42,7 @@
       <div class="stats">
         <div class="stat">موج<b id="ovWave">۰</b></div>
         <div class="stat">دیوهای شکست‌داده<b id="ovKill">۰</b></div>
+        <div class="stat">شکارشده<b id="ovFuck">۰</b></div>
         <div class="stat">رکورد<b id="ovBest">۰</b></div>
       </div>
       <button class="bigbtn" id="againBtn">🔄 دوباره بازی</button>
@@ -49,7 +52,9 @@
 </div>
 <script src="js/config.js"></script>
 <script src="js/audio.js"></script>
-<script src="js/art.js"></script>
+<script src="js/art-core.js"></script>
+<script src="js/art-chars.js"></script>
+<script src="js/art-foe.js"></script>
 <script src="js/game.js"></script>
 </body>
 </html>
